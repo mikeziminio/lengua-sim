@@ -27,13 +27,16 @@ class InputMessage:
 
 class OutputMessage:
     text_content: str
+    command: SimulatorCommand | None
 
     def __init__(
             self,
             *,
-            text_content: str | None = None
+            text_content: str | None = None,
+            command: SimulatorCommand | None = None
     ):
         self.text_content = text_content
+        self.command = command
 
 
 class AbstractIOInterface(ABC):
@@ -54,4 +57,3 @@ class AbstractIOInterface(ABC):
         Отправка пользователю исходящего сообщения
         """
         ...
-

@@ -16,6 +16,8 @@ class Simulator:
 
     target_language: str
     native_language: str
+    partner: str
+
     mode: SimulatorMode
 
     def __init__(
@@ -24,12 +26,14 @@ class Simulator:
             io_interface_class: type[AbstractIOInterface],
             target_language: str,
             native_language: str,
+            partner: str,
             mode: SimulatorMode
     ):
         self.ai_chat = ai_chat_class()
         self.io_interface = io_interface_class()
         self.target_language = target_language
         self.native_language = native_language
+        self.partner = partner
         self.mode = mode
 
     def generate_ai_text_request(self, request: str) -> str:
@@ -46,7 +50,10 @@ class Simulator:
         result_json_items = {
             "correction": f"corrected phrase on {self.target_language} language",
             "correction_native": f"the same on {self.native_language} language",
-            "answer": f"the text of the response to this phrase (from 1 to 30 words), if a human answered",
+            "answer": (
+                      f"imagine that {self.partner} could answer this phrase and ",
+                      f"give the text of that answer (from 1 to 30 words in {self.target_language} language)",
+            ),
             "answer_native": f"the same on {self.native_language} language",
         }
 
@@ -67,6 +74,10 @@ class Simulator:
                 return make_result("correction", "answer")
             case SimulatorMode.CORRECT_AND_ANSWER_WITH_NATIVE:
                 return make_result("correction", "correction_native", "answer", "answer_native")
+            case SimulatorMode.ANSWER:
+                return make_result("answer")
+            case SimulatorMode.ANSWER_WITH_NATIVE:
+                return make_result("answer", "answer_native")
             case _:
                 raise Exception("Неизвестный режим")
                 # TODO: добавить исключение
@@ -75,14 +86,18 @@ class Simulator:
         while True:
             request = await self.io_interface.input()
             if request.command is not None:
-                if request.command == SimulatorCommand.EXIT:
-                    break
+                match request.command:
+                    case SimulatorCommand.EXIT:
+                        break
+                    case SimulatorCommand.OUTPUT_HELP:
+                        output_message = OutputMessage(command=SimulatorCommand.OUTPUT_HELP)
+                        await self.io_interface.output(output_message)
             elif request.new_simulator_mode is not None:
                 self.mode = request.new_simulator_mode
             elif request.text_content is not None:
                 text_request = self.generate_ai_text_request(request.text_content)
-                text_response = await self.ai_chat.send_text_message(text_request)
-                # text_response = text_request
+                # text_response = await self.ai_chat.send_text_message(text_request)
+                text_response = text_request
                 output_message = OutputMessage(text_content=text_response)
                 await self.io_interface.output(output_message)
             else:
