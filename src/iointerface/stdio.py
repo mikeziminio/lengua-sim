@@ -1,7 +1,7 @@
 import sys
 import asyncio
 from iointerface import AbstractIOInterface, InputMessage, OutputMessage
-from simulator import SimulatorMode, SimulatorCommand
+from simulator.enums import SimulatorMode, SimulatorCommand
 
 __all__ = [
     "StdIO"
@@ -15,11 +15,16 @@ class StdIO(AbstractIOInterface):
             asyncio.get_event_loop()
             .run_in_executor(None, sys.stdin.readline)
         )
+        s = s.strip()
         match s:
-            case "/cm":
-                return InputMessage(new_simulator_mode=SimulatorMode.CORRECT_ME)
-            case "/cma":
-                return InputMessage(new_simulator_mode=SimulatorMode.CORRECT_ME_AND_ANSWER)
+            case "/c":
+                return InputMessage(new_simulator_mode=SimulatorMode.CORRECT)
+            case "/cn":
+                return InputMessage(new_simulator_mode=SimulatorMode.CORRECT_WITH_NATIVE)
+            case "/ca":
+                return InputMessage(new_simulator_mode=SimulatorMode.CORRECT_AND_ANSWER)
+            case "/can":
+                return InputMessage(new_simulator_mode=SimulatorMode.CORRECT_AND_ANSWER_WITH_NATIVE)
             case "/raw":
                 return InputMessage(new_simulator_mode=SimulatorMode.RAW)
             case "/exit":
@@ -31,5 +36,5 @@ class StdIO(AbstractIOInterface):
         if message.text_content is not None:
             await (
                 asyncio.get_event_loop()
-                .run_in_executor(None, lambda s=message.text_content: sys.stdout.write(s))
+                .run_in_executor(None, lambda s=message.text_content: sys.stdout.write(s + "\n"))
             )

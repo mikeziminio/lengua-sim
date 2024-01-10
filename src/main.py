@@ -16,7 +16,7 @@ async def main():
         StdIO,
         target_language,
         native_language,
-        SimulatorMode.CORRECT_ME_AND_ANSWER
+        SimulatorMode.CORRECT_AND_ANSWER
     )
     await simulator.run()
 

@@ -3,7 +3,7 @@ from openai import (
     AsyncOpenAI,
     RateLimitError,
 )
-from aichat.abstract import AbstractAIChat
+from aichat import AbstractAIChat
 
 __all__ = [
     "OpenAIChat"

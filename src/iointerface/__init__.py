@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
-from simulator import SimulatorMode, SimulatorCommand
+from simulator.enums import SimulatorMode, SimulatorCommand
 
 __all__ = [
     "InputMessage",
     "OutputMessage",
     "AbstractIOInterface",
 ]
+
 
 class InputMessage:
     text_content: str | None
