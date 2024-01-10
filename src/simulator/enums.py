@@ -7,7 +7,6 @@ __all__ = [
 
 
 class SimulatorMode(Enum):
-    RAW = auto()
     CORRECT = auto()
     CORRECT_WITH_NATIVE = auto()
     CORRECT_AND_ANSWER = auto()
@@ -19,5 +18,7 @@ class SimulatorMode(Enum):
 class SimulatorCommand(Enum):
     EXIT = auto()
     OUTPUT_HELP = auto()
+    OUTPUT_PARAMS = auto()
     CHANGE_TARGET_LANGUAGE = auto()
     CHANGE_NATIVE_LANGUAGE = auto()
+    CHANGE_PARTNER = auto()

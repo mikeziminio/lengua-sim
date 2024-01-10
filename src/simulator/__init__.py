@@ -44,17 +44,18 @@ class Simulator:
         :return: сгенерированный запрос в ИИ чат
         """
         result_json_head = (
-            f"Phrase I want to say in {self.target_language} language: \"{request}\". "
-            f"Give me back json with variables:\n"
+            f"Phrase: \"{request}\". "
+            f"Give me back the json with properties:\n"
         )
         result_json_items = {
-            "correction": f"corrected phrase on {self.target_language} language",
-            "correction_native": f"the same on {self.native_language} language",
+            "correction": f"corrected text of that phrase in {self.target_language} language",
+            "correction_native": f"the same in {self.native_language} language",
             "answer": (
-                      f"imagine that {self.partner} could answer this phrase and ",
-                      f"give the text of that answer (from 1 to 30 words in {self.target_language} language)",
+                      f"imagine that the {self.partner} had a dialogue with me, "
+                      f"come up with the text of they response to this phrase of mine "
+                      f"(from 1 to 30 words in {self.target_language} language)"
             ),
-            "answer_native": f"the same on {self.native_language} language",
+            "answer_native": f"the same in {self.native_language} language",
         }
 
         def make_result(*keys) -> str:
@@ -64,8 +65,6 @@ class Simulator:
             return result
 
         match self.mode:
-            case SimulatorMode.RAW:
-                return request
             case SimulatorMode.CORRECT:
                 return make_result("correction")
             case SimulatorMode.CORRECT_WITH_NATIVE:
@@ -84,20 +83,35 @@ class Simulator:
 
     async def run(self):
         while True:
-            request = await self.io_interface.input()
-            if request.command is not None:
-                match request.command:
-                    case SimulatorCommand.EXIT:
-                        break
+            message = await self.io_interface.input()
+            if message.command is not None:
+                match message.command:
+                    case SimulatorCommand.CHANGE_TARGET_LANGUAGE:
+                        self.target_language = message.command_param
+                    case SimulatorCommand.CHANGE_NATIVE_LANGUAGE:
+                        self.native_language = message.command_param
+                    case SimulatorCommand.CHANGE_PARTNER:
+                        self.partner = message.command_param
+                    case SimulatorCommand.OUTPUT_PARAMS:
+                        simulator_params = {
+                            "target_language": self.target_language,
+                            "native_language": self.native_language,
+                            "partner": self.partner,
+                            "mode": self.mode.name
+                        }.__repr__()
+                        output_message = OutputMessage(text_content=simulator_params)
+                        await self.io_interface.output(output_message)
                     case SimulatorCommand.OUTPUT_HELP:
                         output_message = OutputMessage(command=SimulatorCommand.OUTPUT_HELP)
                         await self.io_interface.output(output_message)
-            elif request.new_simulator_mode is not None:
-                self.mode = request.new_simulator_mode
-            elif request.text_content is not None:
-                text_request = self.generate_ai_text_request(request.text_content)
-                # text_response = await self.ai_chat.send_text_message(text_request)
-                text_response = text_request
+                    case SimulatorCommand.EXIT:
+                        break
+            elif message.new_simulator_mode is not None:
+                self.mode = message.new_simulator_mode
+            elif message.text_content is not None:
+                text_request = self.generate_ai_text_request(message.text_content)
+                text_response = await self.ai_chat.send_text_message(text_request)
+                # text_response = text_request
                 output_message = OutputMessage(text_content=text_response)
                 await self.io_interface.output(output_message)
             else:

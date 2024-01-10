@@ -18,11 +18,13 @@ class InputMessage:
             *,
             text_content: str | None = None,
             new_simulator_mode: SimulatorMode | None = None,
-            command: SimulatorCommand | None = None
+            command: SimulatorCommand | None = None,
+            command_param: str | None = None
     ):
         self.text_content = text_content
         self.new_simulator_mode = new_simulator_mode
         self.command = command
+        self.command_param = command_param
 
 
 class OutputMessage:
@@ -43,6 +45,7 @@ class AbstractIOInterface(ABC):
     """
     Абстрактный класс ввода-вывода
     """
+
     @abstractmethod
     async def input(self) -> InputMessage:
         """
