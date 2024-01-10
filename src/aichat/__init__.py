@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
 
+__all__ = [
+    "AbstractAIChat",
+]
 
 class AbstractAIChat(ABC):
     """

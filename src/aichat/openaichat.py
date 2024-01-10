@@ -5,6 +5,10 @@ from openai import (
 )
 from aichat.abstract import AbstractAIChat
 
+__all__ = [
+    "OpenAIChat"
+]
+
 
 class OpenAIChat(AbstractAIChat):
     """
