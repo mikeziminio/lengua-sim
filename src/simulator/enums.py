@@ -13,6 +13,7 @@ class SimulatorMode(Enum):
     CORRECT_AND_ANSWER_WITH_NATIVE = auto()
     ANSWER = auto()
     ANSWER_WITH_NATIVE = auto()
+    TO_NATIVE = auto()
 
 
 class SimulatorCommand(Enum):

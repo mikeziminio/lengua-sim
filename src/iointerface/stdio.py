@@ -39,6 +39,8 @@ class StdIO(AbstractIOInterface):
             return InputMessage(text_content=m[1])
         command, param = m[1], m[2]
         match command:
+            case "n":
+                return InputMessage(new_simulator_mode=SimulatorMode.TO_NATIVE)
             case "c":
                 return InputMessage(new_simulator_mode=SimulatorMode.CORRECT)
             case "cn":
@@ -71,6 +73,7 @@ class StdIO(AbstractIOInterface):
         if message.command is not None:
             if message.command == SimulatorCommand.OUTPUT_HELP:
                 await self.__async_std_output(
+                    "/n       translate your phrase to native language\n"
                     "/c       correct your phrase\n"
                     "/cn      correct your phrase, add a translation\n"
                     "/ca      correct your phrase and answer it\n"
