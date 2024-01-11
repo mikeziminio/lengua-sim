@@ -4,9 +4,9 @@ from simulator import Simulator, SimulatorMode
 from aichat.openaichat import OpenAIChat
 from iointerface.stdio import StdIO
 
-target_language = "Ukrainian"
+target_language = "Spanish"
 native_language = "Russian"
-partner = "украинская жена"
+partner = "Albert Einstein"
 
 dotenv.load_dotenv("../.env")
 

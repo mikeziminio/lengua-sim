@@ -12,16 +12,14 @@ __all__ = [
 
 class StdIO(AbstractIOInterface):
 
-    def __async_std_input(self):
-        return (asyncio.get_event_loop()
-                .run_in_executor(None, sys.stdin.readline))
+    def __std_input(self):
+        return sys.stdin.readline()
 
-    def __async_std_output(self, output_s: str):
-        return (asyncio.get_event_loop()
-                .run_in_executor(None, lambda s=output_s: sys.stdout.write(s)))
+    def __std_output(self, output_s: str):
+        return sys.stdout.write(output_s)
 
     async def input(self) -> InputMessage:
-        s = await self.__async_std_input()
+        s = self.__std_input()
         m = re.match(r"^/(\w*)\s*(.*?)\s*$", s)  # проверяет на шаблон "/команда параметр"
         if m is None:
             m = re.match(r"^(.*?)\s*$", s)
@@ -59,7 +57,7 @@ class StdIO(AbstractIOInterface):
     async def output(self, message: OutputMessage) -> None:
         if message.command is not None:
             if message.command == SimulatorCommand.OUTPUT_HELP:
-                await self.__async_std_output(
+                self.__std_output(
                     "/c       correct your phrase\n"
                     "/cn      correct your phrase, add a translation\n"
                     "/ca      correct your phrase and answer it\n"
@@ -79,4 +77,4 @@ class StdIO(AbstractIOInterface):
                     "/exit    end the session of LenguaSim\n\n"
                 )
         elif message.text_content is not None:
-            await self.__async_std_output(message.text_content + "\n")
+            self.__std_output(message.text_content + "\n")
