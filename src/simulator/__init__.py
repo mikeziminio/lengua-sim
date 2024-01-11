@@ -52,8 +52,8 @@ class Simulator:
             "correction_native": f"the same in {self.native_language} language",
             "answer": (
                       f"imagine that the {self.partner} had a dialogue with me, "
-                      f"come up with the text of they response to this phrase of mine "
-                      f"(from 1 to 30 words in {self.target_language} language)"
+                      f"come up with the text of they first-person response to this phrase of mine "
+                      f"(from 1 to 20 words in {self.target_language} language)"
             ),
             "answer_native": f"the same in {self.native_language} language",
         }

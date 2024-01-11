@@ -12,14 +12,27 @@ __all__ = [
 
 class StdIO(AbstractIOInterface):
 
-    def __std_input(self):
-        return sys.stdin.readline()
+    def __init__(self):
+        """
+        Долго переписывал логику ввода-вывода в терминал, т.к. периодически валились ошибки.
+        UnicodeDecodeError: 'utf-8' codec can't decode byte 0xd0 in position 0: invalid continuation byte
+        В итоге оказалось, что баг не в коде, а в терминале PyCharm.
+        В обычном терминале ubuntu бага не наблюдается.
+        Поэтому оставил крайнюю асинхронную реализацию. В PyCharm ошибка всё равно периодически валится.
+        """
+        self.__std_in = open(sys.stdin.fileno(), "r")
+        self.__std_out = open(sys.stdout.fileno(), "w")
 
-    def __std_output(self, output_s: str):
-        return sys.stdout.write(output_s)
+    def __async_std_input(self):
+        return (asyncio.get_event_loop()
+                .run_in_executor(None, self.__std_in.readline))
+
+    def __async_std_output(self, output_s: str):
+        return (asyncio.get_event_loop()
+                .run_in_executor(None, lambda s=output_s: self.__std_out.write(s)))
 
     async def input(self) -> InputMessage:
-        s = self.__std_input()
+        s = await self.__async_std_input()
         m = re.match(r"^/(\w*)\s*(.*?)\s*$", s)  # проверяет на шаблон "/команда параметр"
         if m is None:
             m = re.match(r"^(.*?)\s*$", s)
@@ -57,7 +70,7 @@ class StdIO(AbstractIOInterface):
     async def output(self, message: OutputMessage) -> None:
         if message.command is not None:
             if message.command == SimulatorCommand.OUTPUT_HELP:
-                self.__std_output(
+                await self.__async_std_output(
                     "/c       correct your phrase\n"
                     "/cn      correct your phrase, add a translation\n"
                     "/ca      correct your phrase and answer it\n"
@@ -77,4 +90,4 @@ class StdIO(AbstractIOInterface):
                     "/exit    end the session of LenguaSim\n\n"
                 )
         elif message.text_content is not None:
-            self.__std_output(message.text_content + "\n")
+            await self.__async_std_output(message.text_content + "\n")
