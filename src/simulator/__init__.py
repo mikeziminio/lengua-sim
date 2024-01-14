@@ -3,6 +3,7 @@ from typing import Type
 import json
 from aichat import AbstractAIChat
 from iointerface import AbstractIOInterface, OutputMessage
+from speechgenerator import SpeechGenerator
 from simulator.enums import SimulatorMode, SimulatorCommand
 
 __all__ = [
@@ -14,6 +15,7 @@ class Simulator:
 
     ai_chat: AbstractAIChat
     io_interface: AbstractIOInterface
+    speech_generator: SpeechGenerator
 
     target_language: str
     native_language: str
@@ -23,8 +25,10 @@ class Simulator:
 
     def __init__(
             self,
+            *,
             ai_chat_class: type[AbstractAIChat],
             io_interface_class: type[AbstractIOInterface],
+            speech_generator_class: type[SpeechGenerator],
             target_language: str,
             native_language: str,
             partner: str,
@@ -32,6 +36,7 @@ class Simulator:
     ):
         self.ai_chat = ai_chat_class()
         self.io_interface = io_interface_class()
+        self.speech_generator = speech_generator_class()
         self.target_language = target_language
         self.native_language = native_language
         self.partner = partner
