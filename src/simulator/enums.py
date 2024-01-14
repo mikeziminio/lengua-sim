@@ -7,19 +7,19 @@ __all__ = [
 
 
 class SimulatorMode(Enum):
-    CORRECT = auto()
-    CORRECT_WITH_NATIVE = auto()
-    CORRECT_AND_ANSWER = auto()
-    CORRECT_AND_ANSWER_WITH_NATIVE = auto()
-    ANSWER = auto()
-    ANSWER_WITH_NATIVE = auto()
-    TO_NATIVE = auto()
+    CORRECT = "c"
+    CORRECT_WITH_NATIVE = "cn"
+    CORRECT_AND_ANSWER = "ca"
+    CORRECT_AND_ANSWER_WITH_NATIVE = "can"
+    ANSWER = "a"
+    ANSWER_WITH_NATIVE = "an"
+    TO_NATIVE = "n"
 
 
 class SimulatorCommand(Enum):
-    EXIT = auto()
-    OUTPUT_HELP = auto()
-    OUTPUT_PARAMS = auto()
-    CHANGE_TARGET_LANGUAGE = auto()
-    CHANGE_NATIVE_LANGUAGE = auto()
-    CHANGE_PARTNER = auto()
+    EXIT = "exit"
+    OUTPUT_HELP = "help"
+    OUTPUT_PARAMS = "params"
+    CHANGE_TARGET_LANGUAGE = "target"
+    CHANGE_NATIVE_LANGUAGE = "native"
+    CHANGE_PARTNER = "partner"

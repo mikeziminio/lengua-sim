@@ -3,6 +3,7 @@ import dotenv
 from simulator import Simulator, SimulatorMode
 from aichat.openaichat import OpenAIChat
 from iointerface.stdio import StdIO
+from iointerface.telegram import TelegramBotIO
 
 target_language = "Spanish"
 native_language = "Russian"
@@ -14,7 +15,7 @@ dotenv.load_dotenv("../.env")
 async def main():
     simulator = Simulator(
         OpenAIChat,
-        StdIO,
+        TelegramBotIO,  # StdIO,
         target_language,
         native_language,
         partner,

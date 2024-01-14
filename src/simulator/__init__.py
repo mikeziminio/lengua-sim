@@ -55,6 +55,7 @@ class Simulator:
                       f"imagine that the {self.partner} had a dialogue with me, "
                       f"come up with the text of they first-person response to this phrase of mine "
                       f"(from 1 to 20 words in {self.target_language} language)"
+                      f"considering they and my previous remarks"
             ),
             "answer_native": f"the same in {self.native_language} language",
         }
@@ -96,17 +97,18 @@ class Simulator:
             s += f"{key}: {value}\n"
         return s
 
-    async def run(self):
+    async def main_loop(self):
         while True:
-            message = await self.io_interface.input()
-            if message.command is not None:
-                match message.command:
+            input_message = await self.io_interface.input()
+            print(vars(input_message))
+            if input_message.command is not None:
+                match input_message.command:
                     case SimulatorCommand.CHANGE_TARGET_LANGUAGE:
-                        self.target_language = message.command_param
+                        self.target_language = input_message.command_param
                     case SimulatorCommand.CHANGE_NATIVE_LANGUAGE:
-                        self.native_language = message.command_param
+                        self.native_language = input_message.command_param
                     case SimulatorCommand.CHANGE_PARTNER:
-                        self.partner = message.command_param
+                        self.partner = input_message.command_param
                     case SimulatorCommand.OUTPUT_PARAMS:
                         simulator_params = {
                             "target_language": self.target_language,
@@ -114,20 +116,40 @@ class Simulator:
                             "partner": self.partner,
                             "mode": self.mode.name
                         }.__repr__()
-                        output_message = OutputMessage(text_content=simulator_params)
+                        output_message = OutputMessage(
+                            text_content=simulator_params,
+                            context=input_message.context,
+                        )
                         await self.io_interface.output(output_message)
                     case SimulatorCommand.OUTPUT_HELP:
-                        output_message = OutputMessage(command=SimulatorCommand.OUTPUT_HELP)
+                        output_message = OutputMessage(
+                            command=SimulatorCommand.OUTPUT_HELP,
+                            context=input_message.context,
+                        )
                         await self.io_interface.output(output_message)
                     case SimulatorCommand.EXIT:
                         break
-            elif message.new_simulator_mode is not None:
-                self.mode = message.new_simulator_mode
-            elif message.text_content is not None:
-                text_request = self.generate_ai_text_request(message.text_content)
+            elif input_message.simulator_mode is not None:
+                self.mode = input_message.simulator_mode
+            elif input_message.text_content is not None:
+                text_request = self.generate_ai_text_request(input_message.text_content)
                 ai_response = await self.ai_chat.send_text_message(text_request)
                 text_response = self.ai_response_to_text(ai_response)
-                output_message = OutputMessage(text_content=text_response)
+                # text_response = text_request
+                output_message = OutputMessage(
+                    text_content=text_response,
+                    context=input_message.context,
+                )
                 await self.io_interface.output(output_message)
             else:
                 raise Exception("Неизвестный ответ")
+
+    async def run(self):
+        tasks = set()
+        main_task = asyncio.create_task(self.main_loop())
+        print("after main task")
+        tasks.add(main_task)
+        io_interface_task = self.io_interface.get_inner_task()
+        if io_interface_task is not None:
+            tasks.add(io_interface_task)
+        await asyncio.gather(*tasks)
