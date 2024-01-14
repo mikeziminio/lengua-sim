@@ -10,6 +10,7 @@ from aiogram import Bot, Dispatcher, Router
 from aiogram.types import (
     Message,
     BotCommand,
+    FSInputFile,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
     ReplyKeyboardMarkup,
@@ -75,7 +76,7 @@ class CommandTuple(NamedTuple):
 
 
 @dp.message(Command(commands=["target", "native", "partner"]))
-async def message_handler(message: Message) -> None:
+async def command_with_param_handler(message: Message) -> None:
     ct = CommandTuple.from_text(message.text)
     if ct is None:
         Exception("Не команда")
@@ -100,7 +101,7 @@ async def message_handler(message: Message) -> None:
 
 
 @dp.message(Command(commands=["n", "c", "cn", "ca", "can", "a", "an"]))
-async def message_handler(message: Message) -> None:
+async def mode_handler(message: Message) -> None:
     ct = CommandTuple.from_text(message.text)
     if ct is None:
         Exception("Не команда")
@@ -130,7 +131,7 @@ async def message_handler(message: Message) -> None:
 
 
 @dp.message()
-async def message_handler(message: Message) -> None:
+async def text_message_handler(message: Message) -> None:
     input_message = InputMessage(
         text_content=message.text,
         context=MessageContext(
@@ -214,4 +215,8 @@ class TelegramBotIO(AbstractIOInterface[MessageContext]):
             await self.bot.send_message(
                 chat_id=message.context.chat_id,
                 text=message.text_content
+            )
+            await self.bot.send_voice(
+                chat_id=message.context.chat_id,
+                voice=FSInputFile("out.ogg")
             )

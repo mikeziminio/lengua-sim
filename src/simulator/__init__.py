@@ -138,9 +138,9 @@ class Simulator:
                 self.mode = input_message.simulator_mode
             elif input_message.text_content is not None:
                 text_request = self.generate_ai_text_request(input_message.text_content)
-                ai_response = await self.ai_chat.send_text_message(text_request)
-                text_response = self.ai_response_to_text(ai_response)
-                # text_response = text_request
+                # ai_response = await self.ai_chat.send_text_message(text_request)
+                # text_response = self.ai_response_to_text(ai_response)
+                text_response = text_request
                 output_message = OutputMessage(
                     text_content=text_response,
                     context=input_message.context,

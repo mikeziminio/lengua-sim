@@ -28,7 +28,7 @@ class InputMessage(Generic[MessageContext]):
             is_inline_simulator_mode: bool = False,
             command: SimulatorCommand | None = None,
             command_param: str | None = None,
-            context: MessageContext = None,
+            context: MessageContext | None = None,
     ):
         super().__init__()
         self.text_content = text_content
