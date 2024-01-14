@@ -3,6 +3,6 @@ src/.venv/
 __pycache__
 
 .env
-.mp3
-.ogg
+*.mp3
+*.ogg
 /t.py
